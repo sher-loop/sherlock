@@ -32,13 +32,13 @@
       box-shadow:0 0 10px var(--neon), 0 0 15px var(--neon-dark);
     }
 
-    /* playlist container: bottom -> top visual order */
+    /* Playlist container: normal top -> bottom */
     .song-list{
       width:90%; max-width:700px; height:420px;
       padding:10px; border-radius:10px;
       background:var(--panel);
       box-shadow: inset 0 0 20px var(--neon-dark);
-      display:flex; flex-direction:column-reverse; overflow-y:scroll;
+      display:flex; flex-direction:column; overflow-y:scroll;
       scrollbar-color: var(--neon) var(--panel);
     }
 
@@ -119,12 +119,10 @@
   <audio id="audio" preload="metadata"></audio>
 
 <script>
-/* State */
 let songs = [];
 let filteredSongs = [];
-let currentIndex = 0; // index into filteredSongs[]
+let currentIndex = 0;
 
-/* Elements */
 const audio = document.getElementById('audio');
 const songListEl = document.getElementById('songList');
 const playBtn = document.getElementById('play');
@@ -138,7 +136,6 @@ const durationEl = document.getElementById('duration');
 const volumeSlider = document.getElementById('volume');
 const searchInput = document.getElementById('search');
 
-/* Load playlist.json (from your repo) */
 async function loadSongs(){
   try {
     const res = await fetch('https://raw.githubusercontent.com/sher-loop/song/main/List/playlist.json');
@@ -148,15 +145,10 @@ async function loadSongs(){
     songs = [];
   }
   filteredSongs = songs.slice();
-
-  // ✅ Start from the LAST element (bottom of the reversed playlist)
-  currentIndex = filteredSongs.length - 1;
-
+  currentIndex = 0; // start from top
   renderSongs();
 }
 
-
-/* Render songs in NORMAL array order but container is column-reverse so visual bottom->top */
 function renderSongs(){
   songListEl.innerHTML = '';
   filteredSongs.forEach((song, i) => {
@@ -168,36 +160,32 @@ function renderSongs(){
       currentIndex = Number(div.dataset.index);
       playSong();
     };
-    songListEl.appendChild(div); // append normal order (1..N). CSS shows bottom->top.
+    songListEl.appendChild(div);
   });
-
-  // After render, ensure active visible (because layout is reversed, scrollIntoView still works)
   scrollActiveIntoView();
 }
 
-/* Scroll active into view (center) */
 function scrollActiveIntoView(){
   const active = songListEl.querySelector('.song.active');
   if (active) active.scrollIntoView({ behavior:'smooth', block:'center' });
 }
 
-/* Play / Pause */
 function playSong(){
   const song = filteredSongs[currentIndex];
   if (!song) return;
   audio.src = song.url;
-  audio.play().catch(()=>{}); // ignore autoplay errors
+  audio.play().catch(()=>{});
   playBtn.textContent = '⏸';
   nowPlayingEl.textContent = '▶️ ' + song.title;
-  renderSongs(); // update active highlight
+  renderSongs();
   updateMediaSession(song);
 }
+
 function pauseSong(){
   audio.pause();
   playBtn.textContent = '▶️';
 }
 
-/* Next/Prev within filteredSongs (forward playback) */
 function nextSong(){
   if (!filteredSongs.length) return;
   currentIndex = (currentIndex + 1) % filteredSongs.length;
@@ -209,12 +197,10 @@ function prevSong(){
   playSong();
 }
 
-/* Attach controls */
 playBtn.addEventListener('click', () => audio.paused ? playSong() : pauseSong());
 nextBtn.addEventListener('click', nextSong);
 prevBtn.addEventListener('click', prevSong);
 
-/* Progress bar */
 audio.addEventListener('timeupdate', () => {
   const d = audio.duration || 0;
   const percent = d ? (audio.currentTime / d) * 100 : 0;
@@ -230,26 +216,15 @@ progressBar.addEventListener('click', (e) => {
 });
 audio.addEventListener('ended', nextSong);
 
-/* Volume */
 volumeSlider.addEventListener('input', (e) => audio.volume = parseFloat(e.target.value));
 
-/* Search: filter songs; keep playback index sensible */
 searchInput.addEventListener('input', (e) => {
   const q = (e.target.value || '').toLowerCase();
   filteredSongs = songs.filter(s => s.title.toLowerCase().includes(q));
-  if (filteredSongs.length === 0){
-    currentIndex = 0;
-    audio.pause();
-    audio.src = '';
-    nowPlayingEl.textContent = 'No results';
-  } else {
-    // keep currentIndex within bounds; default to 0 (song 1 at bottom)
-    currentIndex = Math.min(currentIndex, filteredSongs.length - 1);
-  }
+  currentIndex = Math.min(currentIndex, filteredSongs.length - 1);
   renderSongs();
 });
 
-/* Media Session API so headphone buttons work */
 function updateMediaSession(song){
   if (!("mediaSession" in navigator) || !song) return;
   try {
@@ -268,7 +243,6 @@ if ("mediaSession" in navigator){
   navigator.mediaSession.setActionHandler('nexttrack', nextSong);
 }
 
-/* Helpers */
 function formatTime(s){
   if (!s || isNaN(s) || s <= 0) return '0:00';
   const m = Math.floor(s/60);
@@ -276,7 +250,6 @@ function formatTime(s){
   return `${m}:${sec}`;
 }
 
-/* Start */
 loadSongs();
 </script>
 </body>
