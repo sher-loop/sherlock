@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sherlock Playlist</title>
+  <link rel="icon" type="image/jpg" href="https://sherloop.rf.gd/pic/sher.jpg">
+  <style>
+    :root{
+      --bg:#000; --panel:#111; --neon:#0ff; --neon-dark:#00f;
+    }
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--neon);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      -webkit-font-smoothing:antialiased;
+    }
+    h1{ margin:20px; font-size:2rem; text-shadow:0 0 20px var(--neon); }
+    .now-playing{
+      text-align:center; margin-bottom:10px; font-size:1.1rem;
+      text-shadow:0 0 10px var(--neon), 0 0 20px var(--neon-dark);
+    }
+
+    .search-bar{
+      width:90%; max-width:700px; padding:10px; margin-bottom:10px;
+      border-radius:8px; border:none; outline:none; font-size:1rem;
+      text-align:center; background:var(--panel); color:var(--neon);
+      box-shadow:0 0 10px var(--neon), 0 0 15px var(--neon-dark);
+    }
+
+    /* playlist container: bottom -> top visual order */
+    .song-list{
+      width:90%; max-width:700px; height:420px;
+      padding:10px; border-radius:10px;
+      background:var(--panel);
+      box-shadow: inset 0 0 20px var(--neon-dark);
+      display:flex; flex-direction:column-reverse; overflow-y:scroll;
+      scrollbar-color: var(--neon) var(--panel);
+    }
+
+    .song{
+      padding:10px; margin-bottom:6px; border-radius:6px;
+      cursor:pointer; transition:0.12s; user-select:none;
+      background:transparent;
+    }
+    .song:hover{ background:#222; box-shadow:0 0 10px var(--neon); }
+    .song.active{
+      background:var(--neon); color:#000; font-weight:700;
+      box-shadow:0 0 15px var(--neon), 0 0 25px var(--neon-dark);
+    }
+
+    .player-controls{
+      width:90%; max-width:700px; display:flex; align-items:center; gap:14px;
+      margin-top:14px; justify-content:flex-start;
+    }
+    .btn{
+      padding:12px 18px; border-radius:50%; border:none; background:var(--panel);
+      color:var(--neon); cursor:pointer; box-shadow:0 0 10px var(--neon);
+      transition:transform .12s, box-shadow .12s;
+    }
+    .btn:hover{ transform:scale(1.15); box-shadow:0 0 22px var(--neon), 0 0 30px var(--neon-dark); }
+
+    .volume-container{ margin-left:auto; display:flex; align-items:center; gap:6px; }
+    .volume-slider{ width:80px; height:6px; appearance:none; border-radius:5px; background:#222; outline:none; box-shadow:inset 0 0 10px var(--neon-dark); }
+    .volume-slider::-webkit-slider-thumb{ appearance:none; width:12px; height:12px; border-radius:50%; background:var(--neon); box-shadow:0 0 10px var(--neon); }
+    .volume-slider::-moz-range-thumb{ width:12px; height:12px; border-radius:50%; background:var(--neon); }
+
+    .progress-container{ width:90%; max-width:700px; display:flex; gap:10px; align-items:center; margin-top:12px; font-size:0.9rem; color:var(--neon); }
+    .progress-bar{ flex:1; height:8px; background:#222; border-radius:6px; overflow:hidden; cursor:pointer; box-shadow:inset 0 0 10px var(--neon-dark); }
+    .progress{ height:100%; width:0%; background:var(--neon); box-shadow:0 0 10px var(--neon), 0 0 20px var(--neon-dark); transition:width .08s linear; }
+
+    /* Scrollbar styling (Chrome/Safari/Edge) */
+    .song-list::-webkit-scrollbar{ width:16px; }
+    .song-list::-webkit-scrollbar-track{ background:var(--panel); border-radius:12px; box-shadow: inset 0 0 10px var(--neon-dark); }
+    .song-list::-webkit-scrollbar-thumb{ background:var(--neon); border-radius:12px; box-shadow:0 0 12px var(--neon); border:3px solid var(--panel); }
+    .song-list::-webkit-scrollbar-thumb:hover{ background:var(--neon-dark); }
+
+    /* Firefox */
+    .song-list{ scrollbar-width:thin; scrollbar-color: var(--neon) var(--panel); }
+
+    @media(min-width:900px){
+      h1{ font-size:2.2rem; } .song-list{ height:520px; max-width:900px; }
+      .progress-container,.player-controls{ max-width:900px; }
+    }
+    
+  </style>
+</head>
+<body>
+  <h1>🎵 Sherlock Playlist</h1>
+  <div id="nowPlaying" class="now-playing">Select a song to play</div>
+
+  <input id="search" class="search-bar" placeholder="Search songs..." />
+
+  <div id="songList" class="song-list" aria-label="Playlist"></div>
+
+  <div class="player-controls">
+    <button id="prev" class="btn" title="Previous">⏮</button>
+    <button id="play" class="btn" title="Play/Pause">▶️</button>
+    <button id="next" class="btn" title="Next">⏭</button>
+
+    <div class="volume-container" title="Volume">
+      <span>🔊</span>
+      <input id="volume" class="volume-slider" type="range" min="0" max="1" step="0.01" value="1" />
+    </div>
+  </div>
+
+  <div class="progress-container">
+    <span id="currentTime">0:00</span>
+    <div id="progressBar" class="progress-bar" title="Seek">
+      <div id="progress" class="progress"></div>
+    </div>
+    <span id="duration">0:00</span>
+  </div>
+
+  <audio id="audio" preload="metadata"></audio>
+
+<script>
+/* State */
+let songs = [];
+let filteredSongs = [];
+let currentIndex = 0; // index into filteredSongs[]
+
+/* Elements */
+const audio = document.getElementById('audio');
+const songListEl = document.getElementById('songList');
+const playBtn = document.getElementById('play');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const nowPlayingEl = document.getElementById('nowPlaying');
+const progressEl = document.getElementById('progress');
+const progressBar = document.getElementById('progressBar');
+const currentTimeEl = document.getElementById('currentTime');
+const durationEl = document.getElementById('duration');
+const volumeSlider = document.getElementById('volume');
+const searchInput = document.getElementById('search');
+
+/* Load playlist.json (from your repo) */
+async function loadSongs(){
+  try {
+    const res = await fetch('https://raw.githubusercontent.com/sher-loop/song/main/List/playlist.json');
+    songs = await res.json();
+  } catch(e){
+    console.error('Failed fetching playlist.json', e);
+    songs = [];
+  }
+  filteredSongs = songs.slice();
+
+  // ✅ Start from the LAST element (bottom of the reversed playlist)
+  currentIndex = filteredSongs.length - 1;
+
+  renderSongs();
+}
+
+
+/* Render songs in NORMAL array order but container is column-reverse so visual bottom->top */
+function renderSongs(){
+  songListEl.innerHTML = '';
+  filteredSongs.forEach((song, i) => {
+    const div = document.createElement('div');
+    div.className = 'song' + (i === currentIndex ? ' active' : '');
+    div.textContent = `${i+1}. ${song.title}`;
+    div.dataset.index = i;
+    div.onclick = () => {
+      currentIndex = Number(div.dataset.index);
+      playSong();
+    };
+    songListEl.appendChild(div); // append normal order (1..N). CSS shows bottom->top.
+  });
+
+  // After render, ensure active visible (because layout is reversed, scrollIntoView still works)
+  scrollActiveIntoView();
+}
+
+/* Scroll active into view (center) */
+function scrollActiveIntoView(){
+  const active = songListEl.querySelector('.song.active');
+  if (active) active.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+/* Play / Pause */
+function playSong(){
+  const song = filteredSongs[currentIndex];
+  if (!song) return;
+  audio.src = song.url;
+  audio.play().catch(()=>{}); // ignore autoplay errors
+  playBtn.textContent = '⏸';
+  nowPlayingEl.textContent = '▶️ ' + song.title;
+  renderSongs(); // update active highlight
+  updateMediaSession(song);
+}
+function pauseSong(){
+  audio.pause();
+  playBtn.textContent = '▶️';
+}
+
+/* Next/Prev within filteredSongs (forward playback) */
+function nextSong(){
+  if (!filteredSongs.length) return;
+  currentIndex = (currentIndex + 1) % filteredSongs.length;
+  playSong();
+}
+function prevSong(){
+  if (!filteredSongs.length) return;
+  currentIndex = (currentIndex - 1 + filteredSongs.length) % filteredSongs.length;
+  playSong();
+}
+
+/* Attach controls */
+playBtn.addEventListener('click', () => audio.paused ? playSong() : pauseSong());
+nextBtn.addEventListener('click', nextSong);
+prevBtn.addEventListener('click', prevSong);
+
+/* Progress bar */
+audio.addEventListener('timeupdate', () => {
+  const d = audio.duration || 0;
+  const percent = d ? (audio.currentTime / d) * 100 : 0;
+  progressEl.style.width = percent + '%';
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+  durationEl.textContent = formatTime(d);
+});
+progressBar.addEventListener('click', (e) => {
+  const rect = progressBar.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const ratio = Math.max(0, Math.min(1, x / rect.width));
+  if (!isNaN(audio.duration)) audio.currentTime = ratio * audio.duration;
+});
+audio.addEventListener('ended', nextSong);
+
+/* Volume */
+volumeSlider.addEventListener('input', (e) => audio.volume = parseFloat(e.target.value));
+
+/* Search: filter songs; keep playback index sensible */
+searchInput.addEventListener('input', (e) => {
+  const q = (e.target.value || '').toLowerCase();
+  filteredSongs = songs.filter(s => s.title.toLowerCase().includes(q));
+  if (filteredSongs.length === 0){
+    currentIndex = 0;
+    audio.pause();
+    audio.src = '';
+    nowPlayingEl.textContent = 'No results';
+  } else {
+    // keep currentIndex within bounds; default to 0 (song 1 at bottom)
+    currentIndex = Math.min(currentIndex, filteredSongs.length - 1);
+  }
+  renderSongs();
+});
+
+/* Media Session API so headphone buttons work */
+function updateMediaSession(song){
+  if (!("mediaSession" in navigator) || !song) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: song.title,
+      artist: song.artist || 'Unknown',
+      album: 'Sherlock Playlist',
+      artwork: [{ src: 'https://sherloop.rf.gd/pic/sher.jpg', sizes:'512x512', type:'image/png' }]
+    });
+  } catch(e){}
+}
+if ("mediaSession" in navigator){
+  navigator.mediaSession.setActionHandler('play', playSong);
+  navigator.mediaSession.setActionHandler('pause', pauseSong);
+  navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+  navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+}
+
+/* Helpers */
+function formatTime(s){
+  if (!s || isNaN(s) || s <= 0) return '0:00';
+  const m = Math.floor(s/60);
+  const sec = Math.floor(s%60).toString().padStart(2,'0');
+  return `${m}:${sec}`;
+}
+
+/* Start */
+loadSongs();
+</script>
+</body>
+</html>
