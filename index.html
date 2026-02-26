@@ -84,22 +84,19 @@
       --highlight: #777777;
     }
 
-    /* Blackout mode - everything vanishes */
+    /* Blackout mode */
     body.blackout {
       background: #000000 !important;
-      color: #000000 !important;
     }
 
     body.blackout * {
       color: #000000 !important;
       background: #000000 !important;
       border-color: #000000 !important;
-      box-shadow: none !important;
-      text-shadow: none !important;
       opacity: 0 !important;
+      pointer-events: none !important;
     }
 
-    body.blackout body::before,
     body.blackout audio,
     body.blackout #audio {
       display: none !important;
@@ -331,14 +328,14 @@
   <audio id="audio" preload="metadata"></audio>
 
 <script>
-// Theme cycling (C key / C button)
+// Theme cycling
 const themes = ["white-blue", "pink", "red", "black", "green", "grey"];
 let currentThemeIndex = 3; // start with black
 
 function changeTheme() {
   currentThemeIndex = (currentThemeIndex + 1) % themes.length;
   document.body.setAttribute("data-theme", themes[currentThemeIndex]);
-  document.body.classList.remove("blackout"); // exit blackout if active
+  document.body.classList.remove("blackout");
 }
 
 document.getElementById("theme").addEventListener("click", changeTheme);
@@ -349,10 +346,6 @@ let isBlackout = false;
 function toggleBlackout() {
   isBlackout = !isBlackout;
   document.body.classList.toggle("blackout", isBlackout);
-  if (isBlackout) {
-    // Optional: pause music during blackout
-    // document.getElementById('audio').pause();
-  }
 }
 
 document.addEventListener("keydown", (e) => {
@@ -363,7 +356,7 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// ────────────────────────────────────────────── rest of the player script
+// ────────────────────────────────────────────── Player Logic
 let songs = [];
 let filteredSongs = [];
 let currentIndex = 0;
@@ -429,6 +422,18 @@ function scrollActiveIntoView() {
   if (active) active.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
+function updateMediaSession(song) {
+  if (!("mediaSession" in navigator)) return;
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: song.title,
+    artist: 'SHERPLAY',
+    album: 'Playlist',
+    artwork: [
+      { src: 'https://raw.githubusercontent.com/sher-loop/sherlock/main/pic/gojo.jpg', sizes: '512x512', type: 'image/jpg' }
+    ]
+  });
+}
+
 function playSong(fromUser = false) {
   if (shuffleMode && !fromUser) {
     currentIndex = Math.floor(Math.random() * filteredSongs.length);
@@ -440,14 +445,30 @@ function playSong(fromUser = false) {
     audio.src = song.url;
     audio.currentTime = 0;
   }
-  audio.play().catch(()=>{});
-  playBtn.textContent = '⏸';
-  nowPlayingEl.textContent = `▶ ${song.title}`;
 
-  document.querySelectorAll('.song').forEach(el => el.classList.remove('active'));
-  const activeEl = songListEl.querySelector(`[data-index="${currentIndex}"]`);
-  if (activeEl) activeEl.classList.add('active');
-  scrollActiveIntoView();
+  audio.play()
+    .then(() => {
+      playBtn.textContent = '⏸';
+      nowPlayingEl.textContent = `▶ ${song.title}`;
+
+      // Set Media Session handlers AFTER playback starts (improves headset compatibility)
+      if ("mediaSession" in navigator) {
+        navigator.mediaSession.setActionHandler('play', () => playSong(true));
+        navigator.mediaSession.setActionHandler('pause', pauseSong);
+        navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+        navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+      }
+
+      updateMediaSession(song);
+
+      document.querySelectorAll('.song').forEach(el => el.classList.remove('active'));
+      const activeEl = songListEl.querySelector(`[data-index="${currentIndex}"]`);
+      if (activeEl) activeEl.classList.add('active');
+      scrollActiveIntoView();
+    })
+    .catch(err => {
+      console.error("Playback failed:", err);
+    });
 }
 
 function pauseSong() {
@@ -494,6 +515,7 @@ function toggleRepeat() {
   repeatBtn.classList.toggle('active', repeatMode !== 'off');
 }
 
+// Event listeners
 playBtn.addEventListener('click', () => audio.paused ? playSong(true) : pauseSong());
 nextBtn.addEventListener('click', nextSong);
 prevBtn.addEventListener('click', prevSong);
