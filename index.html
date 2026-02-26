@@ -15,7 +15,96 @@
       --border: #444444;
       --active-bg: #ffffff;
       --active-text: #000000;
+      --highlight: #888888;
     }
+
+    body[data-theme="white-blue"] {
+      --bg: #0a1a2a;
+      --panel: #112233;
+      --text: #e0f0ff;
+      --accent: #66ccff;
+      --border: #336699;
+      --active-bg: #88ddff;
+      --active-text: #001122;
+      --highlight: #44aaff;
+    }
+
+    body[data-theme="pink"] {
+      --bg: #1a0a12;
+      --panel: #220f1a;
+      --text: #ffe0f0;
+      --accent: #ff99cc;
+      --border: #993366;
+      --active-bg: #ffccdd;
+      --active-text: #330022;
+      --highlight: #ff66aa;
+    }
+
+    body[data-theme="red"] {
+      --bg: #180000;
+      --panel: #220000;
+      --text: #ffd0d0;
+      --accent: #ff6666;
+      --border: #992222;
+      --active-bg: #ff9999;
+      --active-text: #330000;
+      --highlight: #ff4444;
+    }
+
+    body[data-theme="black"] {
+      --bg: #000000;
+      --panel: #0a0a0a;
+      --text: #ffffff;
+      --accent: #cccccc;
+      --border: #444444;
+      --active-bg: #ffffff;
+      --active-text: #000000;
+      --highlight: #888888;
+    }
+
+    body[data-theme="green"] {
+      --bg: #001208;
+      --panel: #0a1a10;
+      --text: #d0ffd0;
+      --accent: #66ff99;
+      --border: #226644;
+      --active-bg: #88ffaa;
+      --active-text: #002211;
+      --highlight: #44cc77;
+    }
+
+    body[data-theme="grey"] {
+      --bg: #111111;
+      --panel: #1a1a1a;
+      --text: #eeeeee;
+      --accent: #aaaaaa;
+      --border: #555555;
+      --active-bg: #dddddd;
+      --active-text: #222222;
+      --highlight: #777777;
+    }
+
+    /* Blackout mode - everything vanishes */
+    body.blackout {
+      background: #000000 !important;
+      color: #000000 !important;
+    }
+
+    body.blackout * {
+      color: #000000 !important;
+      background: #000000 !important;
+      border-color: #000000 !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+      opacity: 0 !important;
+    }
+
+    body.blackout body::before,
+    body.blackout audio,
+    body.blackout #audio {
+      display: none !important;
+    }
+
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -26,6 +115,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: background 0.4s, color 0.4s;
     }
     body::before {
       content: "";
@@ -35,75 +125,74 @@
         to bottom,
         transparent 0px,
         transparent 2px,
-        rgba(255,255,255,0.015) 2px,
-        rgba(255,255,255,0.015) 4px
+        rgba(255,255,255,0.01) 2px,
+        rgba(255,255,255,0.01) 4px
       );
       pointer-events: none;
       z-index: 9999;
       animation: scanline 14s linear infinite;
+      opacity: 0.4;
     }
     @keyframes scanline {
       0% { transform: translateY(-100%); }
       100% { transform: translateY(100%); }
     }
     h1 {
-      margin: 25px 0 15px;
-      font-size: 2.4rem;           /* ← made smaller */
-      letter-spacing: 6px;
+      margin: 22px 0 12px;
+      font-size: 2.3rem;
+      letter-spacing: 5px;
       font-weight: 700;
       text-transform: uppercase;
     }
     .now-playing {
       text-align: center;
-      margin: 0 0 15px;
-      font-size: 1.4rem;           /* slightly smaller */
+      margin: 0 0 12px;
+      font-size: 1.35rem;
       font-family: 'VT323', monospace;
       letter-spacing: 2px;
-      min-height: 1.8rem;
-      color: #dddddd;
+      min-height: 1.7rem;
+      color: var(--accent);
     }
     .search-bar {
       width: 90%;
-      max-width: 760px;
-      padding: 12px;
-      margin-bottom: 15px;
+      max-width: 740px;
+      padding: 11px;
+      margin-bottom: 12px;
       border: 1px solid var(--border);
       border-radius: 0;
-      font-size: 1.05rem;
-      background: #111111;
+      font-size: 1rem;
+      background: var(--panel);
       color: var(--text);
       font-family: 'VT323', monospace;
     }
     .search-bar:focus {
-      border-color: #888888;
+      border-color: var(--highlight);
       outline: none;
     }
     .song-list {
       width: 90%;
-      max-width: 760px;
-      height: 420px;               /* slightly shorter */
-      padding: 12px;
+      max-width: 740px;
+      height: 400px;
+      padding: 10px;
       border: 1px solid var(--border);
       border-radius: 0;
-      background: #050505;
+      background: var(--panel);
       overflow-y: scroll;
-      scrollbar-color: #666 #111;
+      scrollbar-color: var(--highlight) var(--panel);
     }
     .song {
-      padding: 10px 14px;
-      margin-bottom: 6px;
+      padding: 9px 12px;
+      margin-bottom: 5px;
       border-radius: 0;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.2s;
       background: transparent;
       border: 1px solid transparent;
       font-family: 'VT323', monospace;
-      font-size: 1.15rem;
-      display: flex;
-      align-items: center;
+      font-size: 1.1rem;
     }
     .song:hover {
-      background: #1a1a1a;
+      background: rgba(255,255,255,0.06);
     }
     .song.active {
       background: var(--active-bg);
@@ -112,22 +201,22 @@
     }
     .player-controls {
       width: 90%;
-      max-width: 760px;
+      max-width: 740px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      margin: 18px 0 12px;
+      gap: 10px;
+      margin: 15px 0 10px;
       flex-wrap: wrap;
     }
     .btn {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 4px;
-      border: 2px solid #555555;
-      background: #0f0f0f;
-      color: #dddddd;
-      font-size: 1.8rem;
+      border: 2px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-size: 1.7rem;
       cursor: pointer;
       transition: all 0.15s;
       display: flex;
@@ -135,56 +224,61 @@
       justify-content: center;
     }
     .btn:hover {
-      background: #222222;
-      border-color: #999999;
-      color: #ffffff;
+      background: var(--highlight);
+      border-color: var(--accent);
+      color: #000;
       transform: scale(1.08);
     }
     .btn:active {
-      transform: scale(0.96);
-      background: #333333;
+      transform: scale(0.95);
     }
     .btn.active {
-      background: #444444;
-      border-color: #ffffff;
-      color: #ffffff;
+      background: var(--highlight);
+      border-color: var(--text);
+      color: #000;
+    }
+    .btn.theme-btn {
+      font-size: 1.3rem;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: bold;
     }
     .volume-container {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      color: var(--accent);
     }
     .volume-slider {
-      width: 90px;
-      height: 6px;
-      background: #333333;
+      width: 85px;
+      height: 5px;
+      background: var(--border);
       border-radius: 0;
       appearance: none;
     }
     .volume-slider::-webkit-slider-thumb {
-      width: 14px;
-      height: 14px;
+      width: 13px;
+      height: 13px;
       border-radius: 0;
-      background: #cccccc;
+      background: var(--accent);
       cursor: pointer;
-      border: 1px solid #888;
+      border: 1px solid var(--highlight);
     }
     .progress-container {
       width: 90%;
-      max-width: 760px;
+      max-width: 740px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       font-family: 'VT323', monospace;
-      font-size: 1.1rem;
-      color: #cccccc;
+      font-size: 1rem;
+      color: var(--accent);
     }
     .progress-bar {
       flex: 1;
-      height: 7px;
-      background: #222222;
-      border: 1px solid #444444;
+      height: 6px;
+      background: var(--border);
+      border: 1px solid var(--panel);
       border-radius: 0;
       overflow: hidden;
       cursor: pointer;
@@ -192,21 +286,21 @@
     .progress {
       height: 100%;
       width: 0%;
-      background: #ffffff;
+      background: var(--text);
       transition: width 0.1s linear;
     }
     .stats {
-      margin: 8px 0 15px;
+      margin: 6px 0 12px;
       font-family: 'VT323', monospace;
-      font-size: 1.05rem;
-      color: #aaaaaa;
+      font-size: 1rem;
+      color: var(--highlight);
     }
-    .song-list::-webkit-scrollbar { width: 8px; }
-    .song-list::-webkit-scrollbar-track { background: #111; }
-    .song-list::-webkit-scrollbar-thumb { background: #555; border-radius: 0; }
+    .song-list::-webkit-scrollbar { width: 7px; }
+    .song-list::-webkit-scrollbar-track { background: var(--panel); }
+    .song-list::-webkit-scrollbar-thumb { background: var(--highlight); }
   </style>
 </head>
-<body>
+<body data-theme="black">
   <h1>SHERPLAY</h1>
   <div id="nowPlaying" class="now-playing">READY → SELECT TRACK</div>
   <input id="search" class="search-bar" placeholder="FILTER TRACKS..." />
@@ -219,6 +313,7 @@
     <button id="next"    class="btn" title="Next">⏭</button>
     <button id="shuffle" class="btn" title="Shuffle">🔀</button>
     <button id="repeat"  class="btn" title="Repeat: Off">🔁</button>
+    <button id="theme"   class="btn theme-btn" title="Change Theme (C)">C</button>
     <div class="volume-container">
       <span>VOL</span>
       <input id="volume" class="volume-slider" type="range" min="0" max="1" step="0.01" value="0.9" />
@@ -236,7 +331,39 @@
   <audio id="audio" preload="metadata"></audio>
 
 <script>
-// ────────────────────────────────────────────── (unchanged logic)
+// Theme cycling (C key / C button)
+const themes = ["white-blue", "pink", "red", "black", "green", "grey"];
+let currentThemeIndex = 3; // start with black
+
+function changeTheme() {
+  currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+  document.body.setAttribute("data-theme", themes[currentThemeIndex]);
+  document.body.classList.remove("blackout"); // exit blackout if active
+}
+
+document.getElementById("theme").addEventListener("click", changeTheme);
+
+// Blackout mode (V key)
+let isBlackout = false;
+
+function toggleBlackout() {
+  isBlackout = !isBlackout;
+  document.body.classList.toggle("blackout", isBlackout);
+  if (isBlackout) {
+    // Optional: pause music during blackout
+    // document.getElementById('audio').pause();
+  }
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "c") {
+    changeTheme();
+  } else if (e.key.toLowerCase() === "v") {
+    toggleBlackout();
+  }
+});
+
+// ────────────────────────────────────────────── rest of the player script
 let songs = [];
 let filteredSongs = [];
 let currentIndex = 0;
