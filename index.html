@@ -1,577 +1,189 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SHERPLAY</title>
-  <link rel="icon" type="image/jpg" href="https://raw.githubusercontent.com/sher-loop/sherlock/main/pic/gojo.jpg">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=VT323&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #000000;
-      --panel: #0a0a0a;
-      --text: #ffffff;
-      --accent: #cccccc;
-      --border: #444444;
-      --active-bg: #ffffff;
-      --active-text: #000000;
-      --highlight: #888888;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PentestAI | Web App Pentesting AI</title>
 
-    body[data-theme="white-blue"] {
-      --bg: #0a1a2a;
-      --panel: #112233;
-      --text: #e0f0ff;
-      --accent: #66ccff;
-      --border: #336699;
-      --active-bg: #88ddff;
-      --active-text: #001122;
-      --highlight: #44aaff;
-    }
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
 
-    body[data-theme="pink"] {
-      --bg: #1a0a12;
-      --panel: #220f1a;
-      --text: #ffe0f0;
-      --accent: #ff99cc;
-      --border: #993366;
-      --active-bg: #ffccdd;
-      --active-text: #330022;
-      --highlight: #ff66aa;
-    }
+body{
+    background:#05070d;
+    color:#00ff88;
+    overflow:hidden;
+    height:100vh;
+}
 
-    body[data-theme="red"] {
-      --bg: #180000;
-      --panel: #220000;
-      --text: #ffd0d0;
-      --accent: #ff6666;
-      --border: #992222;
-      --active-bg: #ff9999;
-      --active-text: #330000;
-      --highlight: #ff4444;
-    }
+body::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+    radial-gradient(circle at top,#00ff8830,transparent 45%),
+    linear-gradient(#000814,#05070d);
+    z-index:-2;
+}
 
-    body[data-theme="black"] {
-      --bg: #000000;
-      --panel: #0a0a0a;
-      --text: #ffffff;
-      --accent: #cccccc;
-      --border: #444444;
-      --active-bg: #ffffff;
-      --active-text: #000000;
-      --highlight: #888888;
-    }
+body::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:
+    linear-gradient(rgba(0,255,136,.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,255,136,.08) 1px,transparent 1px);
+    background-size:40px 40px;
+    animation:grid 10s linear infinite;
+    z-index:-1;
+}
 
-    body[data-theme="green"] {
-      --bg: #001208;
-      --panel: #0a1a10;
-      --text: #d0ffd0;
-      --accent: #66ff99;
-      --border: #226644;
-      --active-bg: #88ffaa;
-      --active-text: #002211;
-      --highlight: #44cc77;
-    }
+@keyframes grid{
+    from{transform:translateY(0);}
+    to{transform:translateY(40px);}
+}
 
-    body[data-theme="grey"] {
-      --bg: #111111;
-      --panel: #1a1a1a;
-      --text: #eeeeee;
-      --accent: #aaaaaa;
-      --border: #555555;
-      --active-bg: #dddddd;
-      --active-text: #222222;
-      --highlight: #777777;
-    }
+.container{
+    width:90%;
+    max-width:1000px;
+    margin:auto;
+    text-align:center;
+    padding-top:60px;
+}
 
-    /* Blackout mode */
-    body.blackout {
-      background: #000000 !important;
-    }
+.logo{
+    font-size:55px;
+    font-weight:bold;
+    color:#00ff88;
+    text-shadow:0 0 20px #00ff88;
+}
 
-    body.blackout * {
-      color: #000000 !important;
-      background: #000000 !important;
-      border-color: #000000 !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
+.tag{
+    color:#aaa;
+    margin-top:10px;
+    margin-bottom:40px;
+    letter-spacing:2px;
+}
 
-    body.blackout audio,
-    body.blackout #audio {
-      display: none !important;
-    }
+.features{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    margin-bottom:60px;
+}
 
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Orbitron', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: background 0.4s, color 0.4s;
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 2px,
-        rgba(255,255,255,0.01) 2px,
-        rgba(255,255,255,0.01) 4px
-      );
-      pointer-events: none;
-      z-index: 9999;
-      animation: scanline 14s linear infinite;
-      opacity: 0.4;
-    }
-    @keyframes scanline {
-      0% { transform: translateY(-100%); }
-      100% { transform: translateY(100%); }
-    }
-    h1 {
-      margin: 22px 0 12px;
-      font-size: 2.3rem;
-      letter-spacing: 5px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-    .now-playing {
-      text-align: center;
-      margin: 0 0 12px;
-      font-size: 1.35rem;
-      font-family: 'VT323', monospace;
-      letter-spacing: 2px;
-      min-height: 1.7rem;
-      color: var(--accent);
-    }
-    .search-bar {
-      width: 90%;
-      max-width: 740px;
-      padding: 11px;
-      margin-bottom: 12px;
-      border: 1px solid var(--border);
-      border-radius: 0;
-      font-size: 1rem;
-      background: var(--panel);
-      color: var(--text);
-      font-family: 'VT323', monospace;
-    }
-    .search-bar:focus {
-      border-color: var(--highlight);
-      outline: none;
-    }
-    .song-list {
-      width: 90%;
-      max-width: 740px;
-      height: 400px;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 0;
-      background: var(--panel);
-      overflow-y: scroll;
-      scrollbar-color: var(--highlight) var(--panel);
-    }
-    .song {
-      padding: 9px 12px;
-      margin-bottom: 5px;
-      border-radius: 0;
-      cursor: pointer;
-      transition: background 0.2s;
-      background: transparent;
-      border: 1px solid transparent;
-      font-family: 'VT323', monospace;
-      font-size: 1.1rem;
-    }
-    .song:hover {
-      background: rgba(255,255,255,0.06);
-    }
-    .song.active {
-      background: var(--active-bg);
-      color: var(--active-text);
-      font-weight: bold;
-    }
-    .player-controls {
-      width: 90%;
-      max-width: 740px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin: 15px 0 10px;
-      flex-wrap: wrap;
-    }
-    .btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 4px;
-      border: 2px solid var(--border);
-      background: var(--panel);
-      color: var(--text);
-      font-size: 1.7rem;
-      cursor: pointer;
-      transition: all 0.15s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .btn:hover {
-      background: var(--highlight);
-      border-color: var(--accent);
-      color: #000;
-      transform: scale(1.08);
-    }
-    .btn:active {
-      transform: scale(0.95);
-    }
-    .btn.active {
-      background: var(--highlight);
-      border-color: var(--text);
-      color: #000;
-    }
-    .btn.theme-btn {
-      font-size: 1.3rem;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: bold;
-    }
-    .volume-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
-      color: var(--accent);
-    }
-    .volume-slider {
-      width: 85px;
-      height: 5px;
-      background: var(--border);
-      border-radius: 0;
-      appearance: none;
-    }
-    .volume-slider::-webkit-slider-thumb {
-      width: 13px;
-      height: 13px;
-      border-radius: 0;
-      background: var(--accent);
-      cursor: pointer;
-      border: 1px solid var(--highlight);
-    }
-    .progress-container {
-      width: 90%;
-      max-width: 740px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'VT323', monospace;
-      font-size: 1rem;
-      color: var(--accent);
-    }
-    .progress-bar {
-      flex: 1;
-      height: 6px;
-      background: var(--border);
-      border: 1px solid var(--panel);
-      border-radius: 0;
-      overflow: hidden;
-      cursor: pointer;
-    }
-    .progress {
-      height: 100%;
-      width: 0%;
-      background: var(--text);
-      transition: width 0.1s linear;
-    }
-    .stats {
-      margin: 6px 0 12px;
-      font-family: 'VT323', monospace;
-      font-size: 1rem;
-      color: var(--highlight);
-    }
-    .song-list::-webkit-scrollbar { width: 7px; }
-    .song-list::-webkit-scrollbar-track { background: var(--panel); }
-    .song-list::-webkit-scrollbar-thumb { background: var(--highlight); }
-  </style>
+.card{
+    background:#0c1018;
+    border:1px solid #00ff88;
+    border-radius:15px;
+    padding:25px;
+    transition:.3s;
+    box-shadow:0 0 15px #00ff8820;
+}
+
+.card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 0 25px #00ff88;
+}
+
+.card h3{
+    margin-bottom:15px;
+}
+
+.card p{
+    color:#bdbdbd;
+    line-height:1.6;
+}
+
+.center{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+button{
+    padding:18px 55px;
+    font-size:20px;
+    font-weight:bold;
+    color:#000;
+    background:#00ff88;
+    border:none;
+    border-radius:50px;
+    cursor:pointer;
+    transition:.3s;
+    box-shadow:0 0 25px #00ff88;
+}
+
+button:hover{
+    transform:scale(1.08);
+    box-shadow:0 0 45px #00ff88;
+}
+
+.footer{
+    position:absolute;
+    bottom:15px;
+    width:100%;
+    text-align:center;
+    color:#777;
+    font-size:14px;
+}
+</style>
+
 </head>
-<body data-theme="black">
-  <h1>SHERPLAY</h1>
-  <div id="nowPlaying" class="now-playing">READY → SELECT TRACK</div>
-  <input id="search" class="search-bar" placeholder="FILTER TRACKS..." />
-  <div id="stats" class="stats">Tracks: 0 | Est. Runtime: 0:00:00</div>
-  <div id="songList" class="song-list" aria-label="Playlist"></div>
+<body>
 
-  <div class="player-controls">
-    <button id="prev"    class="btn" title="Previous">⏮</button>
-    <button id="play"    class="btn" title="Play/Pause">▶</button>
-    <button id="next"    class="btn" title="Next">⏭</button>
-    <button id="shuffle" class="btn" title="Shuffle">🔀</button>
-    <button id="repeat"  class="btn" title="Repeat: Off">🔁</button>
-    <button id="theme"   class="btn theme-btn" title="Change Theme (C)">C</button>
-    <div class="volume-container">
-      <span>VOL</span>
-      <input id="volume" class="volume-slider" type="range" min="0" max="1" step="0.01" value="0.9" />
-    </div>
-  </div>
+<div class="container">
 
-  <div class="progress-container">
-    <span id="currentTime">0:00</span>
-    <div id="progressBar" class="progress-bar">
-      <div id="progress" class="progress"></div>
-    </div>
-    <span id="duration">0:00</span>
-  </div>
+<div class="logo">PENTEST AI</div>
+<div class="tag">Advanced Web Application Pentesting Intelligence</div>
 
-  <audio id="audio" preload="metadata"></audio>
+<div class="features">
+
+<div class="card">
+<h3>🔍 Smart Recon</h3>
+<p>Automatically maps web applications, discovers hidden endpoints, and analyzes attack surfaces.</p>
+</div>
+
+<div class="card">
+<h3>🛡 Vulnerability Scan</h3>
+<p>Detects common security weaknesses like XSS, SQL Injection, SSRF, IDOR, and more.</p>
+</div>
+
+<div class="card">
+<h3>⚡ AI Analysis</h3>
+<p>Uses AI-powered logic to identify risky behavior and prioritize security findings.</p>
+</div>
+
+<div class="card">
+<h3>📊 Security Reports</h3>
+<p>Generates professional reports with vulnerability summaries and remediation guidance.</p>
+</div>
+
+</div>
+
+<div class="center">
+<button onclick="playAudio()">Explore</button>
+</div>
+
+</div>
+
+<div class="footer">
+PentestAI • Cyber Security Interface
+</div>
+
+<audio id="audio" src="tmp.mp3"></audio>
 
 <script>
-// Theme cycling
-const themes = ["white-blue", "pink", "red", "black", "green", "grey"];
-let currentThemeIndex = 3; // start with black
-
-function changeTheme() {
-  currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-  document.body.setAttribute("data-theme", themes[currentThemeIndex]);
-  document.body.classList.remove("blackout");
+function playAudio(){
+    const audio=document.getElementById("audio");
+    audio.currentTime=0;
+    audio.play();
 }
-
-document.getElementById("theme").addEventListener("click", changeTheme);
-
-// Blackout mode (V key)
-let isBlackout = false;
-
-function toggleBlackout() {
-  isBlackout = !isBlackout;
-  document.body.classList.toggle("blackout", isBlackout);
-}
-
-document.addEventListener("keydown", (e) => {
-  if (e.key.toLowerCase() === "c") {
-    changeTheme();
-  } else if (e.key.toLowerCase() === "v") {
-    toggleBlackout();
-  }
-});
-
-// ────────────────────────────────────────────── Player Logic
-let songs = [];
-let filteredSongs = [];
-let currentIndex = 0;
-let shuffleMode = false;
-let repeatMode = 'off';
-
-const audio = document.getElementById('audio');
-const songListEl = document.getElementById('songList');
-const nowPlayingEl = document.getElementById('nowPlaying');
-const playBtn = document.getElementById('play');
-const prevBtn = document.getElementById('prev');
-const nextBtn = document.getElementById('next');
-const shuffleBtn = document.getElementById('shuffle');
-const repeatBtn = document.getElementById('repeat');
-const progressEl = document.getElementById('progress');
-const progressBar = document.getElementById('progressBar');
-const currentTimeEl = document.getElementById('currentTime');
-const durationEl = document.getElementById('duration');
-const volumeSlider = document.getElementById('volume');
-const searchInput = document.getElementById('search');
-const statsEl = document.getElementById('stats');
-
-async function loadSongs() {
-  try {
-    const res = await fetch('https://raw.githubusercontent.com/sher-loop/song/main/List/playlist.json');
-    songs = await res.json();
-  } catch(e) {
-    console.error('Playlist fetch failed', e);
-    songs = [];
-  }
-  filteredSongs = [...songs];
-  updateStats();
-  renderSongs();
-}
-
-function updateStats() {
-  let totalSec = filteredSongs.length * 180;
-  let h = Math.floor(totalSec / 3600);
-  let m = Math.floor((totalSec % 3600) / 60);
-  let s = totalSec % 60;
-  let durStr = `${h ? h + ':' : ''}${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-  statsEl.textContent = `Tracks: ${filteredSongs.length} | Est. Runtime: ${durStr}`;
-}
-
-function renderSongs() {
-  songListEl.innerHTML = '';
-  filteredSongs.forEach((song, i) => {
-    const div = document.createElement('div');
-    div.className = 'song' + (i === currentIndex ? ' active' : '');
-    div.dataset.index = i;
-    div.innerHTML = `<span>${(i+1).toString().padStart(2,'0')}. ${song.title}</span>`;
-    div.onclick = () => {
-      currentIndex = i;
-      playSong(true);
-    };
-    songListEl.appendChild(div);
-  });
-  scrollActiveIntoView();
-}
-
-function scrollActiveIntoView() {
-  const active = songListEl.querySelector('.song.active');
-  if (active) active.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-function updateMediaSession(song) {
-  if (!("mediaSession" in navigator)) return;
-  navigator.mediaSession.metadata = new MediaMetadata({
-    title: song.title,
-    artist: 'SHERPLAY',
-    album: 'Playlist',
-    artwork: [
-      { src: 'https://raw.githubusercontent.com/sher-loop/sherlock/main/pic/gojo.jpg', sizes: '512x512', type: 'image/jpg' }
-    ]
-  });
-}
-
-function playSong(fromUser = false) {
-  if (shuffleMode && !fromUser) {
-    currentIndex = Math.floor(Math.random() * filteredSongs.length);
-  }
-  const song = filteredSongs[currentIndex];
-  if (!song) return;
-
-  if (audio.src !== song.url) {
-    audio.src = song.url;
-    audio.currentTime = 0;
-  }
-
-  audio.play()
-    .then(() => {
-      playBtn.textContent = '⏸';
-      nowPlayingEl.textContent = `▶ ${song.title}`;
-
-      // Set Media Session handlers AFTER playback starts (improves headset compatibility)
-      if ("mediaSession" in navigator) {
-        navigator.mediaSession.setActionHandler('play', () => playSong(true));
-        navigator.mediaSession.setActionHandler('pause', pauseSong);
-        navigator.mediaSession.setActionHandler('previoustrack', prevSong);
-        navigator.mediaSession.setActionHandler('nexttrack', nextSong);
-      }
-
-      updateMediaSession(song);
-
-      document.querySelectorAll('.song').forEach(el => el.classList.remove('active'));
-      const activeEl = songListEl.querySelector(`[data-index="${currentIndex}"]`);
-      if (activeEl) activeEl.classList.add('active');
-      scrollActiveIntoView();
-    })
-    .catch(err => {
-      console.error("Playback failed:", err);
-    });
-}
-
-function pauseSong() {
-  audio.pause();
-  playBtn.textContent = '▶';
-}
-
-function nextSong() {
-  if (filteredSongs.length === 0) return;
-  if (repeatMode === 'one') {
-    audio.currentTime = 0;
-    audio.play().catch(()=>{});
-    return;
-  }
-  currentIndex = (currentIndex + 1) % filteredSongs.length;
-  playSong();
-}
-
-function prevSong() {
-  if (filteredSongs.length === 0) return;
-  currentIndex = (currentIndex - 1 + filteredSongs.length) % filteredSongs.length;
-  playSong();
-}
-
-function toggleShuffle() {
-  shuffleMode = !shuffleMode;
-  shuffleBtn.classList.toggle('active', shuffleMode);
-}
-
-function toggleRepeat() {
-  if (repeatMode === 'off') {
-    repeatMode = 'all';
-    repeatBtn.textContent = '🔁';
-    repeatBtn.title = 'Repeat: All';
-  } else if (repeatMode === 'all') {
-    repeatMode = 'one';
-    repeatBtn.textContent = '🔂';
-    repeatBtn.title = 'Repeat: One';
-  } else {
-    repeatMode = 'off';
-    repeatBtn.textContent = '🔁';
-    repeatBtn.title = 'Repeat: Off';
-  }
-  repeatBtn.classList.toggle('active', repeatMode !== 'off');
-}
-
-// Event listeners
-playBtn.addEventListener('click', () => audio.paused ? playSong(true) : pauseSong());
-nextBtn.addEventListener('click', nextSong);
-prevBtn.addEventListener('click', prevSong);
-shuffleBtn.addEventListener('click', toggleShuffle);
-repeatBtn.addEventListener('click', toggleRepeat);
-
-audio.addEventListener('timeupdate', () => {
-  const d = audio.duration || 0;
-  const percent = d ? (audio.currentTime / d) * 100 : 0;
-  progressEl.style.width = percent + '%';
-  currentTimeEl.textContent = formatTime(audio.currentTime);
-  durationEl.textContent = formatTime(d);
-});
-
-progressBar.addEventListener('click', (e) => {
-  const rect = progressBar.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const ratio = Math.max(0, Math.min(1, x / rect.width));
-  if (!isNaN(audio.duration)) audio.currentTime = ratio * audio.duration;
-});
-
-audio.addEventListener('ended', () => {
-  if (repeatMode === 'one') {
-    audio.currentTime = 0;
-    audio.play().catch(()=>{});
-  } else if (repeatMode === 'all' || shuffleMode) {
-    nextSong();
-  } else if (currentIndex < filteredSongs.length - 1) {
-    nextSong();
-  } else {
-    pauseSong();
-  }
-});
-
-volumeSlider.addEventListener('input', (e) => audio.volume = parseFloat(e.target.value));
-
-searchInput.addEventListener('input', (e) => {
-  const q = e.target.value.toLowerCase().trim();
-  if (!q) {
-    filteredSongs = [...songs];
-  } else {
-    filteredSongs = songs.filter(s => s.title.toLowerCase().includes(q));
-  }
-  currentIndex = Math.min(currentIndex, filteredSongs.length - 1) || 0;
-  renderSongs();
-  updateStats();
-});
-
-function formatTime(s) {
-  if (!s || isNaN(s) || s <= 0) return '0:00';
-  const m = Math.floor(s / 60);
-  const sec = Math.floor(s % 60).toString().padStart(2, '0');
-  return `${m}:${sec}`;
-}
-
-loadSongs();
 </script>
+
 </body>
 </html>
