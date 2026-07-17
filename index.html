@@ -1,189 +1,887 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PentestAI | Web App Pentesting AI</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SHERPLAY</title>
+  <link rel="icon" type="image/jpg" href="https://raw.githubusercontent.com/sher-loop/sherlock/main/pic/gojo.jpg">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --panel: #0d0d0d;
+      --text: #b0b0b0;
+      --accent: #b0b0b0;
+      --border: #555555;
+      --active-bg: #888888;
+      --active-text: #000000;
+      --highlight: #666666;
+      --glow: 0 0 10px rgba(180, 180, 180, 0.3);
+    }
 
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,Helvetica,sans-serif;
-}
+    body[data-theme="white-blue"] {
+      --bg: #0a1a2a;
+      --panel: #112233;
+      --text: #e0f0ff;
+      --accent: #66ccff;
+      --border: #336699;
+      --active-bg: #88ddff;
+      --active-text: #001122;
+      --highlight: #44aaff;
+    }
 
-body{
-    background:#05070d;
-    color:#00ff88;
-    overflow:hidden;
-    height:100vh;
-}
+    body[data-theme="pink"] {
+      --bg: #1a0a12;
+      --panel: #220f1a;
+      --text: #ffe0f0;
+      --accent: #ff99cc;
+      --border: #993366;
+      --active-bg: #ffccdd;
+      --active-text: #330022;
+      --highlight: #ff66aa;
+    }
 
-body::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:
-    radial-gradient(circle at top,#00ff8830,transparent 45%),
-    linear-gradient(#000814,#05070d);
-    z-index:-2;
-}
+    body[data-theme="red"] {
+      --bg: #180000;
+      --panel: #220000;
+      --text: #ffd0d0;
+      --accent: #ff6666;
+      --border: #992222;
+      --active-bg: #ff9999;
+      --active-text: #330000;
+      --highlight: #ff4444;
+    }
 
-body::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background-image:
-    linear-gradient(rgba(0,255,136,.08) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(0,255,136,.08) 1px,transparent 1px);
-    background-size:40px 40px;
-    animation:grid 10s linear infinite;
-    z-index:-1;
-}
+    body[data-theme="black"] {
+      --bg: #000000;
+      --panel: #0a0a0a;
+      --text: #ffffff;
+      --accent: #cccccc;
+      --border: #444444;
+      --active-bg: #ffffff;
+      --active-text: #000000;
+      --highlight: #888888;
+    }
 
-@keyframes grid{
-    from{transform:translateY(0);}
-    to{transform:translateY(40px);}
-}
+    body[data-theme="green"] {
+      --bg: #001208;
+      --panel: #0a1a10;
+      --text: #d0ffd0;
+      --accent: #66ff99;
+      --border: #226644;
+      --active-bg: #88ffaa;
+      --active-text: #002211;
+      --highlight: #44cc77;
+    }
 
-.container{
-    width:90%;
-    max-width:1000px;
-    margin:auto;
-    text-align:center;
-    padding-top:60px;
-}
+    body[data-theme="grey"] {
+      --bg: #111111;
+      --panel: #1a1a1a;
+      --text: #eeeeee;
+      --accent: #aaaaaa;
+      --border: #555555;
+      --active-bg: #dddddd;
+      --active-text: #222222;
+      --highlight: #777777;
+    }
 
-.logo{
-    font-size:55px;
-    font-weight:bold;
-    color:#00ff88;
-    text-shadow:0 0 20px #00ff88;
-}
+    body[data-theme="hacker"] {
+      --bg: #0a0a0a;
+      --panel: #0d0d0d;
+      --text: #b0b0b0;
+      --accent: #b0b0b0;
+      --border: #555555;
+      --active-bg: #888888;
+      --active-text: #000000;
+      --highlight: #666666;
+      --glow: 0 0 10px rgba(180, 180, 180, 0.3);
+    }
 
-.tag{
-    color:#aaa;
-    margin-top:10px;
-    margin-bottom:40px;
-    letter-spacing:2px;
-}
+    body.blackout {
+      background: #000000 !important;
+    }
 
-.features{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
-    margin-bottom:60px;
-}
+    body.blackout * {
+      color: #000000 !important;
+      background: #000000 !important;
+      border-color: #000000 !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
 
-.card{
-    background:#0c1018;
-    border:1px solid #00ff88;
-    border-radius:15px;
-    padding:25px;
-    transition:.3s;
-    box-shadow:0 0 15px #00ff8820;
-}
+    body.blackout audio,
+    body.blackout #audio {
+      display: none !important;
+    }
 
-.card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 0 25px #00ff88;
-}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Orbitron', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      transition: background 0.4s, color 0.4s;
+      text-align: center;
+    }
 
-.card h3{
-    margin-bottom:15px;
-}
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 2px,
+        rgba(255,255,255,0.01) 2px,
+        rgba(255,255,255,0.01) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+      animation: scanline 14s linear infinite;
+      opacity: 0.4;
+    }
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+    h1 {
+      margin: 15px 0 10px;
+      padding: 0;
+      font-size: 2.5rem;
+      letter-spacing: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-align: center;
+    }
 
-.card p{
-    color:#bdbdbd;
-    line-height:1.6;
-}
+    .now-playing {
+      text-align: center;
+      margin: 0 0 12px;
+      font-size: 1.35rem;
+      font-family: 'VT323', monospace;
+      letter-spacing: 2px;
+      min-height: 1.7rem;
+      color: var(--accent);
+    }
 
-.center{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+    .search-bar {
+      width: 90%;
+      max-width: 740px;
+      padding: 11px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      border-radius: 0;
+      font-size: 1rem;
+      background: var(--panel);
+      color: var(--text);
+      font-family: 'VT323', monospace;
+    }
+    .search-bar:focus {
+      border-color: var(--highlight);
+      outline: none;
+    }
 
-button{
-    padding:18px 55px;
-    font-size:20px;
-    font-weight:bold;
-    color:#000;
-    background:#00ff88;
-    border:none;
-    border-radius:50px;
-    cursor:pointer;
-    transition:.3s;
-    box-shadow:0 0 25px #00ff88;
-}
+    .top-bar {
+      width: 90%;
+      max-width: 740px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .top-bar .stats {
+      font-family: 'VT323', monospace;
+      font-size: 0.95rem;
+      color: var(--highlight);
+    }
+    .top-bar .fav-count {
+      font-family: 'VT323', monospace;
+      font-size: 0.95rem;
+      color: var(--accent);
+      cursor: pointer;
+    }
+    .top-bar .fav-count:hover { text-decoration: underline; }
 
-button:hover{
-    transform:scale(1.08);
-    box-shadow:0 0 45px #00ff88;
-}
+    .song-list {
+      width: 90%;
+      max-width: 740px;
+      height: 400px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 0;
+      background: var(--panel);
+      overflow-y: scroll;
+      scrollbar-color: var(--highlight) var(--panel);
+    }
+    .song {
+      padding: 9px 12px;
+      margin-bottom: 5px;
+      border-radius: 0;
+      cursor: pointer;
+      transition: background 0.2s;
+      background: transparent;
+      border: 1px solid transparent;
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .song:hover {
+      background: rgba(255,255,255,0.06);
+    }
+    .song.active {
+      background: var(--active-bg);
+      color: var(--active-text);
+      font-weight: bold;
+    }
+    .song .fav-btn {
+      background: none;
+      border: none;
+      color: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0 4px;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    .song .fav-btn.favorited {
+      opacity: 1;
+    }
 
-.footer{
-    position:absolute;
-    bottom:15px;
-    width:100%;
-    text-align:center;
-    color:#777;
-    font-size:14px;
-}
-</style>
+    .player-controls {
+      width: 90%;
+      max-width: 740px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 15px auto;
+      flex-wrap: wrap;
+    }
+    .btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      border: 2px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-size: 1.7rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn:hover {
+      background: var(--highlight);
+      border-color: var(--accent);
+      color: #000;
+      transform: scale(1.08);
+    }
+    .btn:active {
+      transform: scale(0.95);
+    }
+    .btn.active {
+      background: var(--highlight);
+      border-color: var(--text);
+      color: #000;
+    }
+    .btn.theme-btn {
+      font-size: 1.3rem;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: bold;
+    }
 
+    .secondary-controls {
+      width: 90%;
+      max-width: 740px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin: 5px auto 10px;
+      flex-wrap: wrap;
+    }
+    .volume-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+    .volume-slider {
+      width: 85px;
+      height: 5px;
+      background: var(--border);
+      border-radius: 0;
+      appearance: none;
+    }
+    .volume-slider::-webkit-slider-thumb {
+      width: 13px;
+      height: 13px;
+      border-radius: 0;
+      background: var(--accent);
+      cursor: pointer;
+      border: 1px solid var(--highlight);
+    }
+
+    .sleep-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-family: 'VT323', monospace;
+    }
+    .sleep-btn {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 2px 8px;
+      cursor: pointer;
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+    }
+    .sleep-btn:hover {
+      background: var(--highlight);
+      color: #000;
+    }
+
+    .progress-container {
+      width: 90%;
+      max-width: 740px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: var(--accent);
+    }
+    .progress-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border: 1px solid var(--panel);
+      border-radius: 0;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: var(--text);
+      transition: width 0.1s linear;
+    }
+
+    .shortcuts-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+    }
+    .shortcuts-overlay.visible {
+      display: flex;
+    }
+    .shortcuts-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 30px 40px;
+      text-align: left;
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem;
+      color: var(--text);
+      max-width: 420px;
+      width: 90%;
+    }
+    .shortcuts-box h2 {
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+      letter-spacing: 3px;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .shortcuts-box div {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .shortcuts-box kbd {
+      background: var(--highlight);
+      color: #000;
+      padding: 1px 8px;
+      font-family: 'VT323', monospace;
+    }
+
+    .song-list::-webkit-scrollbar { width: 7px; }
+    .song-list::-webkit-scrollbar-track { background: var(--panel); }
+    .song-list::-webkit-scrollbar-thumb { background: var(--highlight); }
+
+    .now-playing .np-counter {
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+  </style>
 </head>
-<body>
+<body data-theme="hacker">
+  <h1>SHERPLAY</h1>
+  <div id="nowPlaying" class="now-playing">READY → SELECT TRACK</div>
+  <input id="search" class="search-bar" placeholder="FILTER TRACKS..." />
+  <div class="top-bar">
+    <div id="stats" class="stats">Tracks: 0 | Est. Runtime: 0:00:00</div>
+    <div id="favCount" class="fav-count" title="Show favorites only">♥ 0</div>
+  </div>
+  <div id="songList" class="song-list" aria-label="Playlist"></div>
 
-<div class="container">
+  <div class="player-controls">
+    <button id="prev"    class="btn" title="Previous (P)">⏮</button>
+    <button id="play"    class="btn" title="Play/Pause (Space)">▶</button>
+    <button id="next"    class="btn" title="Next (N)">⏭</button>
+    <button id="shuffle" class="btn" title="Shuffle (S)">🔀</button>
+    <button id="repeat"  class="btn" title="Repeat: Off (R)">🔁</button>
+    <button id="theme"   class="btn theme-btn" title="Change Theme (C)">C</button>
+  </div>
 
-<div class="logo">PENTEST AI</div>
-<div class="tag">Advanced Web Application Pentesting Intelligence</div>
+  <div class="secondary-controls">
+    <div class="volume-container">
+      <span>VOL</span>
+      <input id="volume" class="volume-slider" type="range" min="0" max="1" step="0.01" value="0.9" />
+    </div>
+    <div class="sleep-container">
+      <span>SLEEP</span>
+      <button class="sleep-btn" id="sleepBtn">OFF</button>
+    </div>
+  </div>
 
-<div class="features">
+  <div class="progress-container">
+    <span id="currentTime">0:00</span>
+    <div id="progressBar" class="progress-bar">
+      <div id="progress" class="progress"></div>
+    </div>
+    <span id="duration">0:00</span>
+  </div>
 
-<div class="card">
-<h3>🔍 Smart Recon</h3>
-<p>Automatically maps web applications, discovers hidden endpoints, and analyzes attack surfaces.</p>
-</div>
+  <audio id="audio" preload="metadata"></audio>
 
-<div class="card">
-<h3>🛡 Vulnerability Scan</h3>
-<p>Detects common security weaknesses like XSS, SQL Injection, SSRF, IDOR, and more.</p>
-</div>
-
-<div class="card">
-<h3>⚡ AI Analysis</h3>
-<p>Uses AI-powered logic to identify risky behavior and prioritize security findings.</p>
-</div>
-
-<div class="card">
-<h3>📊 Security Reports</h3>
-<p>Generates professional reports with vulnerability summaries and remediation guidance.</p>
-</div>
-
-</div>
-
-<div class="center">
-<button onclick="playAudio()">Explore</button>
-</div>
-
-</div>
-
-<div class="footer">
-PentestAI • Cyber Security Interface
-</div>
-
-<audio id="audio" src="tmp.mp3"></audio>
+  <div class="shortcuts-overlay" id="shortcutsOverlay">
+    <div class="shortcuts-box">
+      <h2>SHORTCUTS</h2>
+      <div><span>Play / Pause</span><kbd>Space</kbd></div>
+      <div><span>Next</span><kbd>N</kbd></div>
+      <div><span>Previous</span><kbd>P</kbd></div>
+      <div><span>Shuffle</span><kbd>S</kbd></div>
+      <div><span>Repeat</span><kbd>R</kbd></div>
+      <div><span>Theme</span><kbd>C</kbd></div>
+      <div><span>Blackout</span><kbd>V</kbd></div>
+      <div><span>Volume Up</span><kbd>↑</kbd></div>
+      <div><span>Volume Down</span><kbd>↓</kbd></div>
+      <div><span>Favorite</span><kbd>F</kbd></div>
+      <div><span>Seek −5s</span><kbd>←</kbd></div>
+      <div><span>Seek +5s</span><kbd>→</kbd></div>
+      <div><span>Shortcuts</span><kbd>?</kbd></div>
+    </div>
+  </div>
 
 <script>
-function playAudio(){
-    const audio=document.getElementById("audio");
-    audio.currentTime=0;
-    audio.play();
+// ── Persistence ──
+function loadState(key, fallback) {
+  try { return JSON.parse(localStorage.getItem('sherplay_' + key)) ?? fallback; } catch { return fallback; }
 }
-</script>
+function saveState(key, val) { localStorage.setItem('sherplay_' + key, JSON.stringify(val)); }
 
+let favorites = new Set(loadState('favorites', []));
+let savedVolume = loadState('volume', 0.9);
+let savedRepeat = loadState('repeat', 'off');
+let savedShuffle = loadState('shuffle', false);
+let lastPlayedIndex = loadState('lastPlayed', 0);
+let favFilterActive = false;
+
+// ── Theme ──
+const themes = ["white-blue", "pink", "red", "black", "green", "grey", "hacker"];
+let currentThemeIndex = loadState('themeIdx', 6);
+
+function applyTheme() {
+  document.body.setAttribute("data-theme", themes[currentThemeIndex]);
+  document.body.classList.remove("blackout");
+  saveState('themeIdx', currentThemeIndex);
+}
+function changeTheme() {
+  currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+  applyTheme();
+}
+applyTheme();
+document.getElementById("theme").addEventListener("click", changeTheme);
+
+// ── Blackout ──
+let isBlackout = false;
+function toggleBlackout() {
+  isBlackout = !isBlackout;
+  document.body.classList.toggle("blackout", isBlackout);
+}
+
+// ── Sleep Timer ──
+let sleepTimer = null;
+let sleepMinutes = 0;
+const sleepPresets = [0, 15, 30, 45, 60];
+let sleepIdx = 0;
+const sleepBtn = document.getElementById('sleepBtn');
+
+function updateSleepDisplay() {
+  sleepBtn.textContent = sleepMinutes === 0 ? 'OFF' : sleepMinutes + 'm';
+}
+function cycleSleep() {
+  sleepIdx = (sleepIdx + 1) % sleepPresets.length;
+  sleepMinutes = sleepPresets[sleepIdx];
+  updateSleepDisplay();
+  if (sleepTimer) clearTimeout(sleepTimer);
+  if (sleepMinutes > 0) {
+    sleepTimer = setTimeout(() => { pauseSong(); sleepMinutes = 0; sleepIdx = 0; updateSleepDisplay(); }, sleepMinutes * 60000);
+  }
+}
+sleepBtn.addEventListener('click', cycleSleep);
+
+// ── Player Logic ──
+let songs = [];
+let filteredSongs = [];
+let currentIndex = 0;
+let shuffleMode = savedShuffle;
+let repeatMode = savedRepeat;
+
+const audio = document.getElementById('audio');
+const songListEl = document.getElementById('songList');
+const nowPlayingEl = document.getElementById('nowPlaying');
+const playBtn = document.getElementById('play');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const shuffleBtn = document.getElementById('shuffle');
+const repeatBtn = document.getElementById('repeat');
+const progressEl = document.getElementById('progress');
+const progressBar = document.getElementById('progressBar');
+const currentTimeEl = document.getElementById('currentTime');
+const durationEl = document.getElementById('duration');
+const volumeSlider = document.getElementById('volume');
+const searchInput = document.getElementById('search');
+const statsEl = document.getElementById('stats');
+const favCountEl = document.getElementById('favCount');
+
+volumeSlider.value = savedVolume;
+audio.volume = savedVolume;
+shuffleBtn.classList.toggle('active', shuffleMode);
+updateRepeatBtn();
+
+async function loadSongs() {
+  try {
+    const res = await fetch('https://raw.githubusercontent.com/sher-loop/song/main/List/playlist.json');
+    songs = await res.json();
+  } catch(e) {
+    console.error('Playlist fetch failed', e);
+    songs = [];
+  }
+  filteredSongs = [...songs];
+  currentIndex = Math.min(lastPlayedIndex, filteredSongs.length - 1) || 0;
+  updateStats();
+  renderSongs();
+  updateFavCount();
+}
+
+function updateStats() {
+  let totalSec = filteredSongs.length * 180;
+  let h = Math.floor(totalSec / 3600);
+  let m = Math.floor((totalSec % 3600) / 60);
+  let s = totalSec % 60;
+  let durStr = `${h ? h + ':' : ''}${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  statsEl.textContent = `Tracks: ${filteredSongs.length} | Est. Runtime: ${durStr}`;
+}
+
+function updateFavCount() {
+  favCountEl.textContent = '♥ ' + favorites.size;
+}
+
+function isFav(song) {
+  return favorites.has(song.title);
+}
+function toggleFav(song) {
+  if (favorites.has(song.title)) {
+    favorites.delete(song.title);
+  } else {
+    favorites.add(song.title);
+  }
+  saveState('favorites', [...favorites]);
+  updateFavCount();
+  renderSongs();
+}
+
+function renderSongs() {
+  songListEl.innerHTML = '';
+  filteredSongs.forEach((song, i) => {
+    const div = document.createElement('div');
+    div.className = 'song' + (i === currentIndex ? ' active' : '');
+    div.dataset.index = i;
+
+    const numSpan = document.createElement('span');
+    numSpan.textContent = `${(i+1).toString().padStart(2,'0')}. ${song.title}`;
+
+    const favBtn = document.createElement('button');
+    favBtn.className = 'fav-btn' + (isFav(song) ? ' favorited' : '');
+    favBtn.textContent = '♥';
+    favBtn.title = 'Toggle favorite (F)';
+    favBtn.onclick = (e) => { e.stopPropagation(); toggleFav(song); };
+
+    div.appendChild(numSpan);
+    div.appendChild(favBtn);
+    div.onclick = () => { currentIndex = i; playSong(true); };
+    songListEl.appendChild(div);
+  });
+  scrollActiveIntoView();
+}
+
+function scrollActiveIntoView() {
+  const active = songListEl.querySelector('.song.active');
+  if (active) active.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function updateMediaSession(song) {
+  if (!("mediaSession" in navigator)) return;
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: song.title,
+    artist: 'SHERPLAY',
+    album: 'Playlist',
+    artwork: [
+      { src: 'https://raw.githubusercontent.com/sher-loop/sherlock/main/pic/gojo.jpg', sizes: '512x512', type: 'image/jpg' }
+    ]
+  });
+}
+
+function playSong(fromUser = false) {
+  if (shuffleMode && !fromUser) {
+    currentIndex = Math.floor(Math.random() * filteredSongs.length);
+  }
+  const song = filteredSongs[currentIndex];
+  if (!song) return;
+
+  if (audio.src !== song.url) {
+    audio.src = song.url;
+    audio.currentTime = 0;
+  }
+
+  audio.play()
+    .then(() => {
+      playBtn.textContent = '⏸';
+      const trackNum = `${currentIndex + 1}/${filteredSongs.length}`;
+      nowPlayingEl.innerHTML = `▶ ${song.title} <span class="np-counter">[${trackNum}]</span>`;
+
+      if ("mediaSession" in navigator) {
+        navigator.mediaSession.setActionHandler('play', () => playSong(true));
+        navigator.mediaSession.setActionHandler('pause', pauseSong);
+        navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+        navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+      }
+
+      updateMediaSession(song);
+
+      document.querySelectorAll('.song').forEach(el => el.classList.remove('active'));
+      const activeEl = songListEl.querySelector(`[data-index="${currentIndex}"]`);
+      if (activeEl) activeEl.classList.add('active');
+      scrollActiveIntoView();
+      saveState('lastPlayed', currentIndex);
+    })
+    .catch(err => {
+      console.error("Playback failed:", err);
+    });
+}
+
+function pauseSong() {
+  audio.pause();
+  playBtn.textContent = '▶';
+  nowPlayingEl.innerHTML = nowPlayingEl.innerHTML.replace('▶', '⏸');
+}
+
+function nextSong() {
+  if (filteredSongs.length === 0) return;
+  if (repeatMode === 'one') {
+    audio.currentTime = 0;
+    audio.play().catch(()=>{});
+    return;
+  }
+  currentIndex = (currentIndex + 1) % filteredSongs.length;
+  playSong();
+}
+
+function prevSong() {
+  if (filteredSongs.length === 0) return;
+  if (audio.currentTime > 3) {
+    audio.currentTime = 0;
+    return;
+  }
+  currentIndex = (currentIndex - 1 + filteredSongs.length) % filteredSongs.length;
+  playSong();
+}
+
+function toggleShuffle() {
+  shuffleMode = !shuffleMode;
+  shuffleBtn.classList.toggle('active', shuffleMode);
+  saveState('shuffle', shuffleMode);
+}
+
+function updateRepeatBtn() {
+  if (repeatMode === 'off') {
+    repeatBtn.textContent = '🔁';
+    repeatBtn.title = 'Repeat: Off (R)';
+  } else if (repeatMode === 'all') {
+    repeatBtn.textContent = '🔁';
+    repeatBtn.title = 'Repeat: All (R)';
+  } else {
+    repeatBtn.textContent = '🔂';
+    repeatBtn.title = 'Repeat: One (R)';
+  }
+  repeatBtn.classList.toggle('active', repeatMode !== 'off');
+}
+
+function toggleRepeat() {
+  if (repeatMode === 'off') repeatMode = 'all';
+  else if (repeatMode === 'all') repeatMode = 'one';
+  else repeatMode = 'off';
+  updateRepeatBtn();
+  saveState('repeat', repeatMode);
+}
+
+function toggleFavCurrent() {
+  const song = filteredSongs[currentIndex];
+  if (song) toggleFav(song);
+}
+
+// ── Event listeners ──
+playBtn.addEventListener('click', () => audio.paused ? playSong(true) : pauseSong());
+nextBtn.addEventListener('click', nextSong);
+prevBtn.addEventListener('click', prevSong);
+shuffleBtn.addEventListener('click', toggleShuffle);
+repeatBtn.addEventListener('click', toggleRepeat);
+
+audio.addEventListener('timeupdate', () => {
+  const d = audio.duration || 0;
+  const percent = d ? (audio.currentTime / d) * 100 : 0;
+  progressEl.style.width = percent + '%';
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+  durationEl.textContent = formatTime(d);
+});
+
+progressBar.addEventListener('click', (e) => {
+  const rect = progressBar.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const ratio = Math.max(0, Math.min(1, x / rect.width));
+  if (!isNaN(audio.duration)) audio.currentTime = ratio * audio.duration;
+});
+
+audio.addEventListener('ended', () => {
+  if (repeatMode === 'one') {
+    audio.currentTime = 0;
+    audio.play().catch(()=>{});
+  } else if (repeatMode === 'all' || shuffleMode) {
+    nextSong();
+  } else if (currentIndex < filteredSongs.length - 1) {
+    nextSong();
+  } else {
+    pauseSong();
+  }
+});
+
+volumeSlider.addEventListener('input', (e) => {
+  audio.volume = parseFloat(e.target.value);
+  saveState('volume', audio.volume);
+});
+
+searchInput.addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  if (!q) {
+    filteredSongs = [...songs];
+  } else {
+    filteredSongs = songs.filter(s => s.title.toLowerCase().includes(q));
+  }
+  currentIndex = Math.min(currentIndex, filteredSongs.length - 1) || 0;
+  renderSongs();
+  updateStats();
+});
+
+favCountEl.addEventListener('click', () => {
+  favFilterActive = !favFilterActive;
+  if (favFilterActive) {
+    filteredSongs = songs.filter(s => favorites.has(s.title));
+    favCountEl.style.textDecoration = 'underline';
+  } else {
+    const q = searchInput.value.toLowerCase().trim();
+    filteredSongs = q ? songs.filter(s => s.title.toLowerCase().includes(q)) : [...songs];
+    favCountEl.style.textDecoration = 'none';
+  }
+  currentIndex = 0;
+  renderSongs();
+  updateStats();
+});
+
+const shortcutsOverlay = document.getElementById('shortcutsOverlay');
+shortcutsOverlay.addEventListener('click', () => shortcutsOverlay.classList.remove('visible'));
+
+// ── Keyboard Shortcuts ──
+document.addEventListener("keydown", (e) => {
+  const tag = document.activeElement.tagName;
+  if (tag === 'INPUT') return;
+
+  switch (e.key.toLowerCase()) {
+    case ' ':
+      e.preventDefault();
+      audio.paused ? playSong(true) : pauseSong();
+      break;
+    case 'n': nextSong(); break;
+    case 'p': prevSong(); break;
+    case 's': toggleShuffle(); break;
+    case 'r': toggleRepeat(); break;
+    case 'c': changeTheme(); break;
+    case 'v': toggleBlackout(); break;
+    case 'f': toggleFavCurrent(); break;
+    case 'arrowup':
+      e.preventDefault();
+      audio.volume = Math.min(1, audio.volume + 0.05);
+      volumeSlider.value = audio.volume;
+      saveState('volume', audio.volume);
+      break;
+    case 'arrowdown':
+      e.preventDefault();
+      audio.volume = Math.max(0, audio.volume - 0.05);
+      volumeSlider.value = audio.volume;
+      saveState('volume', audio.volume);
+      break;
+    case 'arrowleft':
+      e.preventDefault();
+      if (!isNaN(audio.duration)) audio.currentTime = Math.max(0, audio.currentTime - 5);
+      break;
+    case 'arrowright':
+      e.preventDefault();
+      if (!isNaN(audio.duration)) audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
+      break;
+    case '?': shortcutsOverlay.classList.toggle('visible'); break;
+    case 'escape': shortcutsOverlay.classList.remove('visible'); break;
+  }
+});
+
+function formatTime(s) {
+  if (!s || isNaN(s) || s <= 0) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60).toString().padStart(2, '0');
+  return `${m}:${sec}`;
+}
+
+loadSongs();
+</script>
 </body>
 </html>
+<script async data-explicit-opt-in="true" data-cookie-opt-in="true" data-deployment-id="dpl_EXJqF3as7Ccg4aVZ5PDnoqPHJKyw" src="https://vercel.live/_next-live/feedback/feedback.js"></script>
